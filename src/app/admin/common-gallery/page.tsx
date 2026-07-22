@@ -2,9 +2,10 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
-import { FormEvent, useEffect, useState } from "react";
+import { useState } from "react";
 import { AdminShell } from "@/components/AdminShell";
 import { useAuth } from "@/components/AuthProvider";
+import { MediaPicker } from "@/components/MediaPicker";
 import {
   AdminListSkeleton,
   Button,
@@ -13,42 +14,13 @@ import {
   Input,
 } from "@/components/ui";
 import { api } from "@/lib/api";
-import type { CommonGalleryImage } from "@/lib/types";
+import type { CommonGalleryImage, HeroShowcaseImage } from "@/lib/types";
 
 export default function AdminCommonGalleryPage() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
-  const [files, setFiles] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [formError, setFormError] = useState("");
-
-  useEffect(() => {
-    const urls = files.map((file) => URL.createObjectURL(file));
-    setPreviews(urls);
-    return () => {
-      urls.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [files]);
-
-  function addFiles(list: FileList | null) {
-    if (!list?.length) return;
-    const incoming = Array.from(list).filter((file) =>
-      file.type.startsWith("image/")
-    );
-    setFiles((prev) => {
-      const next = [...prev];
-      for (const file of incoming) {
-        const duplicate = next.some(
-          (existing) =>
-            existing.name === file.name &&
-            existing.size === file.size &&
-            existing.lastModified === file.lastModified
-        );
-        if (!duplicate) next.push(file);
-      }
-      return next.slice(0, 30);
-    });
-  }
 
   const imagesQuery = useQuery({
     queryKey: ["admin", "common-gallery"],
@@ -58,12 +30,13 @@ export default function AdminCommonGalleryPage() {
   });
 
   const images = imagesQuery.data?.images ?? [];
+  const existingPublicIds = new Set(images.map((image) => image.publicId));
 
   const uploadMutation = useMutation({
-    mutationFn: async () => {
-      if (!files.length) throw new Error("Add at least one image");
+    mutationFn: async (libraryImages: HeroShowcaseImage[]) => {
+      if (!libraryImages.length) throw new Error("Add at least one image");
       const form = new FormData();
-      files.forEach((file) => form.append("images", file));
+      form.append("libraryImages", JSON.stringify(libraryImages));
       return api.post<{ images: CommonGalleryImage[] }>(
         "/common-gallery",
         form,
@@ -71,8 +44,8 @@ export default function AdminCommonGalleryPage() {
       );
     },
     onSuccess: async () => {
-      setFiles([]);
       setFormError("");
+      setPickerOpen(false);
       await queryClient.invalidateQueries({
         queryKey: ["admin", "common-gallery"],
       });
@@ -121,11 +94,6 @@ export default function AdminCommonGalleryPage() {
     },
   });
 
-  function onSubmit(event: FormEvent) {
-    event.preventDefault();
-    uploadMutation.mutate();
-  }
-
   return (
     <AdminShell
       title="Common Gallery"
@@ -135,52 +103,25 @@ export default function AdminCommonGalleryPage() {
         <h2 className="font-display text-xl font-semibold text-ink">
           Upload images
         </h2>
-        <form onSubmit={onSubmit} className="space-y-4">
-          <Input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => addFiles(e.target.files)}
-          />
-          {previews.length ? (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
-              {previews.map((src, index) => (
-                <div
-                  key={src}
-                  className="relative aspect-square overflow-hidden rounded-xl border border-line bg-soft"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={src}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-1 top-1 rounded bg-ink/80 px-1.5 text-xs text-white"
-                    onClick={() =>
-                      setFiles((prev) => prev.filter((_, i) => i !== index))
-                    }
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : null}
-          {formError ? (
-            <p className="text-sm text-red-600">{formError}</p>
-          ) : null}
-          <Button
-            type="submit"
-            variant="accent"
-            disabled={uploadMutation.isPending || files.length === 0}
-          >
-            {uploadMutation.isPending
-              ? "Uploading…"
-              : `Upload ${files.length || ""} image${files.length === 1 ? "" : "s"}`}
-          </Button>
-        </form>
+        <button
+          type="button"
+          onClick={() => {
+            setFormError("");
+            setPickerOpen(true);
+          }}
+          className="flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line bg-background px-4 py-6 text-center hover:border-accent"
+        >
+          <span className="text-sm font-semibold text-ink">Add photos</span>
+          <span className="text-xs text-muted">
+            Open Cloudinary library — pick existing or upload new
+          </span>
+        </button>
+        {formError ? (
+          <p className="text-sm text-red-600">{formError}</p>
+        ) : null}
+        {uploadMutation.isPending ? (
+          <p className="text-sm text-muted">Adding photos to common gallery…</p>
+        ) : null}
       </Card>
 
       <div className="space-y-3">
@@ -235,7 +176,9 @@ export default function AdminCommonGalleryPage() {
                       variant="outline"
                       onClick={() => {
                         if (
-                          window.confirm("Delete this image from the common gallery?")
+                          window.confirm(
+                            "Delete this image from the common gallery?"
+                          )
                         ) {
                           deleteMutation.mutate(image._id);
                         }
@@ -245,7 +188,8 @@ export default function AdminCommonGalleryPage() {
                     </Button>
                   </div>
                   <p className="text-xs text-muted">
-                    {image.isPublished ? "Published" : "Hidden"} · {image.publicId}
+                    {image.isPublished ? "Published" : "Hidden"} ·{" "}
+                    {image.publicId}
                   </p>
                 </div>
               </Card>
@@ -253,6 +197,28 @@ export default function AdminCommonGalleryPage() {
           </div>
         )}
       </div>
+
+      <MediaPicker
+        open={pickerOpen}
+        title="Common Gallery photos"
+        maxSelect={30}
+        selected={[]}
+        onClose={() => setPickerOpen(false)}
+        onConfirm={(picked) => {
+          const fresh = picked.filter(
+            (image) => !existingPublicIds.has(image.publicId)
+          );
+          if (!fresh.length) {
+            setFormError(
+              picked.length
+                ? "Those images are already in the common gallery"
+                : "Select at least one image"
+            );
+            return;
+          }
+          uploadMutation.mutate(fresh);
+        }}
+      />
     </AdminShell>
   );
 }

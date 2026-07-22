@@ -3,9 +3,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { AdminShell } from "@/components/AdminShell";
 import { useAuth } from "@/components/AuthProvider";
+import { MediaPicker } from "@/components/MediaPicker";
 import {
   Button,
   Card,
@@ -16,7 +17,7 @@ import {
 } from "@/components/ui";
 import { formatDate, placeLabel, eventBannerImage } from "@/lib/content";
 import { api } from "@/lib/api";
-import type { GalleryEvent, School } from "@/lib/types";
+import type { GalleryEvent, HeroShowcaseImage, School } from "@/lib/types";
 
 export default function AdminGalleriesPage() {
   const { token } = useAuth();
@@ -27,38 +28,10 @@ export default function AdminGalleriesPage() {
   const [eventSchoolId, setEventSchoolId] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [eventYoutubeUrls, setEventYoutubeUrls] = useState<string[]>([""]);
-  const [eventImages, setEventImages] = useState<File[]>([]);
-  const [eventImagePreviews, setEventImagePreviews] = useState<string[]>([]);
+  const [eventImages, setEventImages] = useState<HeroShowcaseImage[]>([]);
   const [eventBannerIndex, setEventBannerIndex] = useState(0);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [formError, setFormError] = useState("");
-
-  useEffect(() => {
-    const urls = eventImages.map((file) => URL.createObjectURL(file));
-    setEventImagePreviews(urls);
-    return () => {
-      urls.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [eventImages]);
-
-  function addEventImages(files: FileList | null) {
-    if (!files?.length) return;
-    const incoming = Array.from(files).filter((file) =>
-      file.type.startsWith("image/")
-    );
-    setEventImages((prev) => {
-      const next = [...prev];
-      for (const file of incoming) {
-        const duplicate = next.some(
-          (existing) =>
-            existing.name === file.name &&
-            existing.size === file.size &&
-            existing.lastModified === file.lastModified
-        );
-        if (!duplicate) next.push(file);
-      }
-      return next.slice(0, 30);
-    });
-  }
 
   function removeEventImage(index: number) {
     setEventImages((prev) => prev.filter((_, i) => i !== index));
@@ -102,7 +75,7 @@ export default function AdminGalleriesPage() {
       form.append("youtubeUrls", JSON.stringify(youtubeUrls));
       form.append("bannerIndex", String(eventBannerIndex));
       form.append("isPublished", "true");
-      eventImages.forEach((file) => form.append("images", file));
+      form.append("libraryImages", JSON.stringify(eventImages));
       return api.post("/events", form, token);
     },
     onSuccess: async () => {
@@ -247,22 +220,16 @@ export default function AdminGalleriesPage() {
                 ({eventImages.length}/30 selected)
               </span>
             </p>
-            <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line bg-background px-4 py-6 text-center hover:border-accent">
+            <button
+              type="button"
+              onClick={() => setPickerOpen(true)}
+              className="flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line bg-background px-4 py-6 text-center hover:border-accent"
+            >
               <span className="text-sm font-semibold text-ink">Add photos</span>
               <span className="text-xs text-muted">
-                Select multiple at once, or add more in another pick
+                Open Cloudinary library — pick existing or upload new
               </span>
-              <Input
-                type="file"
-                accept="image/*"
-                multiple
-                className="sr-only"
-                onChange={(e) => {
-                  addEventImages(e.target.files);
-                  e.target.value = "";
-                }}
-              />
-            </label>
+            </button>
 
             {eventImages.length > 0 ? (
               <>
@@ -270,11 +237,11 @@ export default function AdminGalleriesPage() {
                   Click a photo to set it as the gallery banner card image.
                 </p>
                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
-                  {eventImages.map((file, index) => {
+                  {eventImages.map((image, index) => {
                     const isBanner = eventBannerIndex === index;
                     return (
                       <div
-                        key={`${file.name}-${file.lastModified}-${index}`}
+                        key={image.publicId}
                         className={`relative aspect-square overflow-hidden rounded-xl border bg-background ${
                           isBanner
                             ? "border-accent ring-2 ring-accent"
@@ -285,16 +252,15 @@ export default function AdminGalleriesPage() {
                           type="button"
                           onClick={() => setEventBannerIndex(index)}
                           className="absolute inset-0 z-0"
-                          aria-label={`Use ${file.name} as banner`}
+                          aria-label={`Use photo ${index + 1} as banner`}
                         />
-                        {eventImagePreviews[index] ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={eventImagePreviews[index]}
-                            alt={file.name}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : null}
+                        <Image
+                          src={image.url}
+                          alt={image.alt || eventTitle || "Gallery photo"}
+                          fill
+                          className="object-cover"
+                          sizes="120px"
+                        />
                         {isBanner ? (
                           <span className="absolute left-1 top-1 z-10 rounded-md bg-accent px-1.5 py-0.5 text-[10px] font-semibold text-white">
                             Banner
@@ -314,7 +280,8 @@ export default function AdminGalleriesPage() {
               </>
             ) : (
               <p className="text-xs text-muted">
-                Tip: hold Cmd (Mac) or Ctrl (Windows) to select many photos.
+                Tip: you can select many photos in the media library, or upload
+                new ones there first.
               </p>
             )}
           </div>
@@ -324,11 +291,26 @@ export default function AdminGalleriesPage() {
             disabled={createEvent.isPending || schools.length === 0}
           >
             {createEvent.isPending
-              ? `Uploading ${eventImages.length} photo${eventImages.length === 1 ? "" : "s"}...`
+              ? `Creating gallery with ${eventImages.length} photo${eventImages.length === 1 ? "" : "s"}...`
               : "Create gallery"}
           </Button>
         </form>
       </Card>
+
+      <MediaPicker
+        open={pickerOpen}
+        title="Gallery photos"
+        maxSelect={30}
+        selected={eventImages}
+        onClose={() => setPickerOpen(false)}
+        onConfirm={(images) => {
+          setEventImages(images.slice(0, 30));
+          setEventBannerIndex((prev) =>
+            images.length === 0 ? 0 : Math.min(prev, images.length - 1)
+          );
+          setPickerOpen(false);
+        }}
+      />
 
       <section className="space-y-3">
         <h2 className="text-xl font-bold text-ink">All galleries</h2>

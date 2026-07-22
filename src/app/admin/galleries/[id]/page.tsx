@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { AdminShell } from "@/components/AdminShell";
 import { useAuth } from "@/components/AuthProvider";
+import { MediaPicker } from "@/components/MediaPicker";
 import {
   Button,
   Card,
@@ -15,7 +16,12 @@ import {
   AdminFormSkeleton,
 } from "@/components/ui";
 import { api } from "@/lib/api";
-import type { EventImage, GalleryEvent, School } from "@/lib/types";
+import type {
+  EventImage,
+  GalleryEvent,
+  HeroShowcaseImage,
+  School,
+} from "@/lib/types";
 
 function schoolIdOf(event: GalleryEvent) {
   return typeof event.school === "object" ? event.school._id : event.school;
@@ -43,8 +49,8 @@ export default function AdminEditGalleryPage() {
   const [existingImages, setExistingImages] = useState<EventImage[]>([]);
   const [removedPublicIds, setRemovedPublicIds] = useState<string[]>([]);
   const [bannerPublicId, setBannerPublicId] = useState("");
-  const [newImages, setNewImages] = useState<File[]>([]);
-  const [newPreviews, setNewPreviews] = useState<string[]>([]);
+  const [libraryImages, setLibraryImages] = useState<HeroShowcaseImage[]>([]);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [formError, setFormError] = useState("");
   const [hydrated, setHydrated] = useState(false);
 
@@ -82,14 +88,6 @@ export default function AdminEditGalleryPage() {
     setHydrated(true);
   }, [eventQuery.data, hydrated]);
 
-  useEffect(() => {
-    const urls = newImages.map((file) => URL.createObjectURL(file));
-    setNewPreviews(urls);
-    return () => {
-      urls.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [newImages]);
-
   const visibleExisting = useMemo(
     () =>
       existingImages.filter(
@@ -98,18 +96,14 @@ export default function AdminEditGalleryPage() {
     [existingImages, removedPublicIds]
   );
 
-  function addNewImages(files: FileList | null) {
-    if (!files?.length) return;
-    const incoming = Array.from(files).filter((file) =>
-      file.type.startsWith("image/")
-    );
-    setNewImages((prev) => [...prev, ...incoming].slice(0, 30));
-  }
-
   const updateEvent = useMutation({
     mutationFn: async () => {
       const cleanedVideos = youtubeUrls.map((url) => url.trim()).filter(Boolean);
-      if (visibleExisting.length === 0 && newImages.length === 0 && cleanedVideos.length === 0) {
+      if (
+        visibleExisting.length === 0 &&
+        libraryImages.length === 0 &&
+        cleanedVideos.length === 0
+      ) {
         throw new Error("Keep at least one photo or YouTube link");
       }
 
@@ -121,7 +115,7 @@ export default function AdminEditGalleryPage() {
       form.append("youtubeUrls", JSON.stringify(cleanedVideos));
       form.append("removeImagePublicIds", JSON.stringify(removedPublicIds));
       if (bannerPublicId) form.append("bannerPublicId", bannerPublicId);
-      newImages.forEach((file) => form.append("images", file));
+      form.append("libraryImages", JSON.stringify(libraryImages));
       return api.put<{ event: GalleryEvent }>(`/events/${eventId}`, form, token);
     },
     onSuccess: async (data) => {
@@ -322,43 +316,39 @@ export default function AdminEditGalleryPage() {
               <p className="text-sm font-medium text-ink">
                 Add more photos{" "}
                 <span className="font-normal text-muted">
-                  ({newImages.length} new)
+                  ({libraryImages.length} new)
                 </span>
               </p>
-              <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line bg-background px-4 py-6 text-center hover:border-accent">
+              <button
+                type="button"
+                onClick={() => setPickerOpen(true)}
+                className="flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line bg-background px-4 py-6 text-center hover:border-accent"
+              >
                 <span className="text-sm font-semibold text-ink">Add photos</span>
-                <Input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  className="sr-only"
-                  onChange={(e) => {
-                    addNewImages(e.target.files);
-                    e.target.value = "";
-                  }}
-                />
-              </label>
-              {newImages.length > 0 ? (
+                <span className="text-xs text-muted">
+                  Open Cloudinary library — pick existing or upload new
+                </span>
+              </button>
+              {libraryImages.length > 0 ? (
                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
-                  {newImages.map((file, index) => (
+                  {libraryImages.map((image) => (
                     <div
-                      key={`${file.name}-${index}`}
+                      key={image.publicId}
                       className="relative aspect-square overflow-hidden rounded-xl border border-line"
                     >
-                      {newPreviews[index] ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={newPreviews[index]}
-                          alt={file.name}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : null}
+                      <Image
+                        src={image.url}
+                        alt={image.alt || title}
+                        fill
+                        className="object-cover"
+                        sizes="120px"
+                      />
                       <button
                         type="button"
                         className="absolute right-1 top-1 rounded-md bg-ink/80 px-1.5 py-0.5 text-[10px] font-semibold text-white"
                         onClick={() =>
-                          setNewImages((prev) =>
-                            prev.filter((_, i) => i !== index)
+                          setLibraryImages((prev) =>
+                            prev.filter((item) => item.publicId !== image.publicId)
                           )
                         }
                       >
@@ -381,6 +371,21 @@ export default function AdminEditGalleryPage() {
           </form>
         </Card>
       )}
+
+      <MediaPicker
+        open={pickerOpen}
+        title="Add gallery photos"
+        maxSelect={Math.max(1, 30 - visibleExisting.length)}
+        selected={libraryImages}
+        onClose={() => setPickerOpen(false)}
+        onConfirm={(images) => {
+          const blocked = new Set(visibleExisting.map((img) => img.publicId));
+          setLibraryImages(
+            images.filter((img) => !blocked.has(img.publicId)).slice(0, 30)
+          );
+          setPickerOpen(false);
+        }}
+      />
     </AdminShell>
   );
 }
