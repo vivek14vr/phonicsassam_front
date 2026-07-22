@@ -118,7 +118,12 @@ export function AboutFocusGrid({
           whileInView="show"
           viewport={viewportOnce}
           variants={polaroidDrop}
-          whileHover={{ y: -10, rotate: 0, scale: 1.02, zIndex: 2 }}
+          whileHover={{
+            y: -10,
+            rotate: i % 2 === 0 ? -2.5 : 2.5,
+            scale: 1.02,
+            zIndex: 2,
+          }}
           className="overflow-hidden rounded-2xl border border-line bg-white shadow-[4px_4px_0_0_rgba(182,106,203,0.12)]"
         >
           <div className="relative aspect-[16/10] overflow-hidden">

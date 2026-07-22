@@ -18,13 +18,13 @@ export const stickerSlap: Variants = {
   },
 };
 
-/** Polaroid drop — gallery cards */
+/** Polaroid drop — gallery cards (rest straight; tilt on hover at call site) */
 export const polaroidDrop: Variants = {
   hidden: { opacity: 0, y: 48, rotate: 4, scale: 0.94 },
   show: (i: number) => ({
     opacity: 1,
     y: 0,
-    rotate: i % 2 === 0 ? -1.5 : 1.5,
+    rotate: 0,
     scale: 1,
     transition: { ...springSoft, delay: i * 0.1 },
   }),

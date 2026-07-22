@@ -11,7 +11,8 @@ const links = [
   { href: "/admin", label: "Overview", exact: true },
   { href: "/admin/homepage", label: "Homepage" },
   { href: "/admin/cities", label: "Cities & schools" },
-  { href: "/admin/galleries", label: "Galleries" },
+  { href: "/admin/common-gallery", label: "Common Gallery" },
+  { href: "/admin/galleries", label: "Location galleries" },
   { href: "/admin/workshops", label: "Workshops" },
 ];
 

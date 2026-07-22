@@ -269,24 +269,18 @@ export function HeroShowcase({
             {data.browseCtaLabel}
           </Link>
         </div>
-      </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 24, rotate: -2 }}
-        animate={{ opacity: 1, y: 0, rotate: 1.5 }}
-        transition={{ delay: 0.45, type: "spring", stiffness: 200, damping: 16 }}
-        className="relative z-10 mt-4 w-full rounded-2xl border border-line bg-white p-3 shadow-[0_18px_50px_-20px_rgba(17,17,17,0.35)] sm:mt-5 sm:p-4"
-        style={{ transformOrigin: "left center" }}
-      >
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-accent">
-          {data.featuredEyebrow}
-        </p>
-        <p className="mt-1 text-sm font-semibold text-ink sm:text-base">
-          {data.featuredTitle}
-        </p>
-        <p className="mt-1 text-xs leading-5 text-muted sm:text-sm sm:leading-6">
-          {data.featuredDescription}
-        </p>
+        <div className="relative z-10 mt-4 border-t border-line pt-4">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-accent">
+            {data.featuredEyebrow}
+          </p>
+          <p className="mt-1 text-sm font-semibold text-ink sm:text-base">
+            {data.featuredTitle}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-muted sm:text-sm sm:leading-6">
+            {data.featuredDescription}
+          </p>
+        </div>
       </motion.div>
     </div>
   );

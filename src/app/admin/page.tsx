@@ -22,16 +22,22 @@ const sections = [
     step: "2",
   },
   {
-    href: "/admin/galleries",
-    title: "Galleries",
-    detail: "Create past-event galleries with photos, banner, and videos.",
+    href: "/admin/common-gallery",
+    title: "Common Gallery",
+    detail: "Upload shared photos for the homepage mosaic and Common Gallery tab.",
     step: "3",
+  },
+  {
+    href: "/admin/galleries",
+    title: "Location galleries",
+    detail: "Create past-event galleries with photos, banner, and videos.",
+    step: "4",
   },
   {
     href: "/admin/workshops",
     title: "Workshops",
     detail: "Manage workshop cards with fees, dates, venues, and CTAs.",
-    step: "4",
+    step: "5",
   },
 ];
 
@@ -68,7 +74,7 @@ export default function AdminOverviewPage() {
   const counts = [
     { label: "Cities", value: citiesQuery.data?.cities.length ?? 0 },
     { label: "Schools", value: schoolsQuery.data?.schools.length ?? 0 },
-    { label: "Galleries", value: eventsQuery.data?.events.length ?? 0 },
+    { label: "Location galleries", value: eventsQuery.data?.events.length ?? 0 },
     { label: "Workshops", value: programsQuery.data?.programs.length ?? 0 },
   ];
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
@@ -41,7 +42,33 @@ import {
   staggerStickers,
   viewportOnce,
 } from "@/lib/motion";
-import type { GalleryEvent, HeroShowcaseContent, Program } from "@/lib/types";
+import type {
+  CommonGalleryImage,
+  GalleryEvent,
+  HeroShowcaseContent,
+  Program,
+} from "@/lib/types";
+
+const MOSAIC_LIMIT = 5;
+const LOCATION_EVENTS_LIMIT = 3;
+
+function pickRandomEvents(events: GalleryEvent[], limit: number) {
+  const copy = [...events];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, limit);
+}
+
+/** 4-col pack: one tall left tile + four small tiles — no empty cells. */
+const mosaicSpans = [
+  "col-span-2 row-span-2 min-h-[11rem] sm:min-h-[13rem]",
+  "aspect-[4/3]",
+  "aspect-[4/3]",
+  "aspect-[4/3]",
+  "aspect-[4/3]",
+];
 
 const teasers: {
   eyebrow: string;
@@ -57,7 +84,7 @@ const teasers: {
     title: "See classrooms come alive",
     detail:
       "Photos from training days and school visits — songs, stories, actions, and phonics in real government classrooms.",
-    href: "/galleries",
+    href: "/galleries?tab=common",
     cta: "Browse Galleries",
     icon: "camera",
     image: "kidsSchool",
@@ -107,8 +134,16 @@ const journeyBeats: {
 ];
 
 export default function HomePage() {
+  const mosaicQuery = useQuery({
+    queryKey: ["common-gallery", "random", MOSAIC_LIMIT],
+    queryFn: () =>
+      api.get<{ images: CommonGalleryImage[] }>(
+        `/common-gallery/public/random?limit=${MOSAIC_LIMIT}`
+      ),
+  });
+
   const eventsQuery = useQuery({
-    queryKey: ["events", "home"],
+    queryKey: ["events", "home", "location"],
     queryFn: () => api.get<{ events: GalleryEvent[] }>("/events/public"),
   });
 
@@ -123,7 +158,15 @@ export default function HomePage() {
       api.get<{ heroShowcase: HeroShowcaseContent }>("/settings/public"),
   });
 
-  const recentEvents = (eventsQuery.data?.events ?? []).slice(0, 3);
+  const mosaicImages = mosaicQuery.data?.images ?? [];
+  const locationEvents = useMemo(
+    () =>
+      pickRandomEvents(
+        eventsQuery.data?.events ?? [],
+        LOCATION_EVENTS_LIMIT
+      ),
+    [eventsQuery.data?.events]
+  );
   const workshops = (workshopsQuery.data?.programs ?? []).slice(0, 3);
   const heroShowcase = settingsQuery.data?.heroShowcase ?? DEFAULT_HERO_SHOWCASE;
 
@@ -234,6 +277,179 @@ export default function HomePage() {
         </Container>
       </section>
 
+      <Section className="py-10 sm:py-12">
+        <Container className="space-y-5">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <SectionHeader
+              className="space-y-1.5"
+              eyebrow="Common Gallery"
+              title="Moments from the classrooms"
+              description="A fresh mix of shared photos — reshuffled each visit."
+            />
+            <div className="flex flex-wrap gap-2">
+              <Button href="/galleries?tab=common" variant="accent" size="sm">
+                View common gallery
+              </Button>
+            </div>
+          </div>
+
+          {mosaicQuery.isLoading ? (
+            <GalleryGridSkeleton count={4} />
+          ) : mosaicQuery.error ? (
+            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+              {(mosaicQuery.error as Error).message}
+            </p>
+          ) : mosaicImages.length === 0 ? (
+            <EmptyState>
+              No common gallery photos yet. Upload them from Admin → Common
+              Gallery.
+            </EmptyState>
+          ) : (
+            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4 sm:gap-2">
+              {mosaicImages.slice(0, MOSAIC_LIMIT).map((image, index) => (
+                <motion.div
+                  key={image._id}
+                  initial={{ opacity: 0, scale: 0.94, y: 10 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  viewport={viewportOnce}
+                  transition={{
+                    type: "spring",
+                    stiffness: 340,
+                    damping: 24,
+                    delay: index * 0.03,
+                  }}
+                  whileHover={{ scale: 1.015, zIndex: 2 }}
+                  className={`relative overflow-hidden rounded-xl border border-line bg-soft ${
+                    mosaicSpans[index] ?? "aspect-[4/3]"
+                  }`}
+                >
+                  <Link
+                    href="/galleries?tab=common"
+                    className="absolute inset-0 block"
+                  >
+                    <Image
+                      src={image.url}
+                      alt={image.alt || "Classroom moment"}
+                      fill
+                      className="object-cover"
+                      sizes={
+                        index === 0
+                          ? "(max-width: 640px) 100vw, 40vw"
+                          : "(max-width: 640px) 50vw, 20vw"
+                      }
+                    />
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </Container>
+      </Section>
+
+      <Section id="location-galleries" className="py-10 sm:py-12">
+        <Container className="space-y-5">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <SectionHeader
+              className="space-y-1.5"
+              eyebrow="By location"
+              title="Past event galleries"
+              description="A few school workshops and training days from across the map."
+            />
+            <Button href="/galleries?tab=location" variant="outline" size="sm">
+              View all locations
+            </Button>
+          </div>
+
+          {eventsQuery.isLoading ? (
+            <GalleryGridSkeleton count={3} />
+          ) : eventsQuery.error ? (
+            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+              {(eventsQuery.error as Error).message}
+            </p>
+          ) : locationEvents.length === 0 ? (
+            <EmptyState>
+              No location galleries yet. Add a city, school, and event with
+              photos from Admin.
+            </EmptyState>
+          ) : (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {locationEvents.map((event, i) => {
+                const banner = eventBannerImage(event);
+                return (
+                  <motion.div
+                    key={event._id}
+                    custom={i}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={viewportOnce}
+                    variants={polaroidDrop}
+                    whileHover={{
+                      rotate: i % 2 === 0 ? -2.5 : 2.5,
+                      y: -10,
+                      scale: 1.03,
+                      zIndex: 2,
+                    }}
+                    className="origin-bottom"
+                  >
+                    <Link
+                      href={`/galleries/${event.slug}`}
+                      className="block h-full"
+                    >
+                      <Card
+                        padded={false}
+                        className="h-full overflow-hidden border-2 border-ink/10 bg-white p-2 shadow-[6px_6px_0_0_rgba(182,106,203,0.18)]"
+                      >
+                        <div className="relative aspect-[5/4] overflow-hidden bg-soft">
+                          {banner?.url ? (
+                            <Image
+                              src={banner.url}
+                              alt={event.title}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, 33vw"
+                            />
+                          ) : (
+                            <Image
+                              src="/scenes/classroom.jpg"
+                              alt=""
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, 33vw"
+                            />
+                          )}
+                        </div>
+                        <div className="space-y-2 p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
+                            Past event
+                          </p>
+                          <CardTitle>{event.title}</CardTitle>
+                          <CardDescription>
+                            {placeLabel(event.state, event.cityName)}
+                            {event.schoolName ? ` · ${event.schoolName}` : ""}
+                          </CardDescription>
+                          {formatDate(event.eventDate) ? (
+                            <p className="text-sm text-muted">
+                              {formatDate(event.eventDate)}
+                            </p>
+                          ) : null}
+                        </div>
+                      </Card>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+        </Container>
+      </Section>
+
+      <HomeVideoSection
+        url="https://youtu.be/EztOWHk1mUE"
+        eyebrow="Watch"
+        title="See the mission in motion"
+        detail="A look at how classrooms come alive with structured phonics — and how children grow into confident readers."
+      />
+
       <StoryBand
         image="school"
         eyebrow="About the Project"
@@ -281,13 +497,6 @@ export default function HomePage() {
         detail={projectStory.classroomMoments}
         align="right"
         tone="page"
-      />
-
-      <HomeVideoSection
-        url="https://youtu.be/EztOWHk1mUE"
-        eyebrow="Watch"
-        title="See the mission in motion"
-        detail="A look at how classrooms come alive with structured phonics — and how children grow into confident readers."
       />
 
       <Section>
@@ -373,109 +582,6 @@ export default function HomePage() {
         <Container className="space-y-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <SectionHeader
-              eyebrow="Galleries"
-              title="Moments from the classrooms"
-              description="Past training events and school visits across the initiative."
-            />
-            <Button href="/galleries" variant="outline">
-              View all galleries
-            </Button>
-          </div>
-
-          {eventsQuery.isLoading ? (
-            <GalleryGridSkeleton count={3} />
-          ) : eventsQuery.error ? (
-            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-              {(eventsQuery.error as Error).message}
-            </p>
-          ) : recentEvents.length === 0 ? (
-            <EmptyState>
-              No past events yet. Add one with photos from Admin.
-            </EmptyState>
-          ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {recentEvents.map((event, i) => {
-                const banner = eventBannerImage(event);
-                return (
-                  <motion.div
-                    key={event._id}
-                    custom={i}
-                    initial="hidden"
-                    whileInView="show"
-                    viewport={viewportOnce}
-                    variants={polaroidDrop}
-                    whileHover={{
-                      rotate: 0,
-                      y: -12,
-                      scale: 1.03,
-                      zIndex: 2,
-                    }}
-                    className="origin-bottom"
-                  >
-                    <Link
-                      href={`/galleries/${event.slug}`}
-                      className="block h-full"
-                    >
-                      <Card
-                        padded={false}
-                        className="h-full overflow-hidden border-2 border-ink/10 bg-white p-2 shadow-[6px_6px_0_0_rgba(182,106,203,0.18)]"
-                      >
-                        <div className="relative aspect-[5/4] overflow-hidden bg-white">
-                          {banner?.url ? (
-                            <motion.div
-                              className="absolute inset-0"
-                              whileHover={{ scale: 1.1 }}
-                              transition={{ duration: 0.5 }}
-                            >
-                              <Image
-                                src={banner.url}
-                                alt={event.title}
-                                fill
-                                className="object-cover"
-                                sizes="(max-width: 768px) 100vw, 33vw"
-                              />
-                            </motion.div>
-                          ) : (
-                            <div className="relative h-full">
-                              <Image
-                                src="/scenes/classroom.jpg"
-                                alt=""
-                                fill
-                                className="object-cover"
-                                sizes="(max-width: 768px) 100vw, 33vw"
-                              />
-                            </div>
-                          )}
-                        </div>
-                        <div className="space-y-2 p-4">
-                          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
-                            Past event
-                          </p>
-                          <CardTitle>{event.title}</CardTitle>
-                          <CardDescription>
-                            {placeLabel(event.state, event.cityName)}
-                            {event.schoolName ? ` · ${event.schoolName}` : ""}
-                          </CardDescription>
-                          {formatDate(event.eventDate) ? (
-                            <p className="text-sm text-muted">
-                              {formatDate(event.eventDate)}
-                            </p>
-                          ) : null}
-                        </div>
-                      </Card>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
-          )}
-        </Container>
-      </Section>
-
-      <Section>
-        <Container className="space-y-8">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <SectionHeader
               eyebrow="Workshops"
               title="Teacher capacity building"
               description="Structured phonics workshops for educators strengthening foundational reading."
@@ -509,7 +615,7 @@ export default function HomePage() {
         eyebrow="The vision continues"
         title={projectStory.closingLine}
         detail={projectStory.visionClose}
-        primaryHref="/galleries"
+        primaryHref="/galleries?tab=common"
         primaryLabel="See classroom moments"
         secondaryHref="/about"
         secondaryLabel="Read the full story"

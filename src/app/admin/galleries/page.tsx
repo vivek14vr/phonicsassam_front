@@ -129,8 +129,8 @@ export default function AdminGalleriesPage() {
 
   return (
     <AdminShell
-      title="Galleries"
-      description="Step 2 — create a past-event gallery with photos, banner, and videos."
+      title="Location galleries"
+      description="Create past-event galleries tied to a school — photos, banner, and videos."
     >
       {formError ? (
         <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">

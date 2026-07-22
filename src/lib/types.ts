@@ -53,6 +53,18 @@ export type GalleryEvent = {
   updatedAt: string;
 };
 
+/** Shared common gallery image (not tied to location). */
+export type CommonGalleryImage = {
+  _id: string;
+  url: string;
+  publicId: string;
+  alt: string;
+  sortOrder: number;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type GalleryPlace = {
   state: string;
   city: string;
