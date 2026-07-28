@@ -30,8 +30,8 @@ export function AboutStoryBlock() {
           whileHover={{ scale: 1.05 }}
         >
           <Image
-            src={siteImages.kidsLearning.src}
-            alt={siteImages.kidsLearning.alt}
+            src={siteImages.aboutFutures.src}
+            alt={siteImages.aboutFutures.alt}
             fill
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 50vw"
@@ -86,8 +86,8 @@ export function AboutStoryBlock() {
             show: { opacity: 1, y: 0 },
           }}
         >
-          <Button href="/workshops" variant="accent">
-            View Workshops
+          <Button href="/reading-success" variant="accent">
+            Reading Success
           </Button>
           <Button href="/galleries" variant="outline">
             Browse Galleries

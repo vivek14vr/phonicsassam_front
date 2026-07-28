@@ -50,7 +50,7 @@ export default function GalleryEventPage({
 
   return (
     <div className="bg-background">
-      <Section className="border-b border-line py-6 sm:py-8">
+      <Section className="border-b border-line pt-28 pb-6 sm:pt-32 sm:pb-8 md:pt-36">
         <Container className="space-y-3">
           <Link
             href="/galleries"

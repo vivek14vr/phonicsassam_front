@@ -38,8 +38,8 @@ export type PitchCard = {
 export const workshopPitch = {
   who: {
     title: "Who is this workshop for?",
-    ctaLabel: "Explore workshops",
-    ctaHref: "/workshops",
+    ctaLabel: "Reading Success",
+    ctaHref: "/reading-success",
     items: [
       { title: "Teachers", detail: "Classroom educators building early reading skills.", icon: "teacher" as const },
       { title: "Parents", detail: "Home support for children learning letter sounds.", icon: "parent" as const },

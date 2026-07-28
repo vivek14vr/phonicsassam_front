@@ -6,8 +6,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { DEFAULT_HERO_SHOWCASE, HeroShowcase } from "@/components/HeroShowcase";
-import { WhoWorkshopIsForCompact } from "@/components/WhoWorkshopIsFor";
-import { WorkshopCard } from "@/components/WorkshopCard";
 import { SketchHeadline } from "@/components/SketchHeadline";
 import { CountUpStat } from "@/components/CountUpStat";
 import { IconBadge } from "@/components/PitchIcon";
@@ -28,7 +26,6 @@ import {
   Container,
   EmptyState,
   GalleryGridSkeleton,
-  ProgramGridSkeleton,
   Section,
   SectionHeader,
 } from "@/components/ui";
@@ -46,7 +43,6 @@ import type {
   CommonGalleryImage,
   GalleryEvent,
   HeroShowcaseContent,
-  Program,
 } from "@/lib/types";
 
 const MOSAIC_LIMIT = 5;
@@ -90,7 +86,7 @@ const teasers: {
     image: "kidsSchool",
   },
   {
-    eyebrow: "About",
+    eyebrow: "About Our Journey",
     title: "How Phonics Assam began",
     detail:
       "From a 2022 vision with Komal Goenka and Ramesh Jain to a statewide literacy movement for confident young readers.",
@@ -100,12 +96,12 @@ const teasers: {
     image: "teacherClass",
   },
   {
-    eyebrow: "Workshops",
-    title: "Build teacher capacity",
+    eyebrow: "Reading Success",
+    title: "See confidence take shape",
     detail:
-      "Workshops that equip educators with structured phonics practice for the foundational years.",
-    href: "/workshops",
-    cta: "View Workshops",
+      "Authentic classroom moments from Assam — children who once struggled with letters now reading with confidence.",
+    href: "/reading-success",
+    cta: "Reading Success",
     icon: "play",
     image: "kidsLearning",
   },
@@ -147,11 +143,6 @@ export default function HomePage() {
     queryFn: () => api.get<{ events: GalleryEvent[] }>("/events/public"),
   });
 
-  const workshopsQuery = useQuery({
-    queryKey: ["workshops", "home"],
-    queryFn: () => api.get<{ programs: Program[] }>("/programs/public"),
-  });
-
   const settingsQuery = useQuery({
     queryKey: ["settings", "public"],
     queryFn: () =>
@@ -167,14 +158,13 @@ export default function HomePage() {
       ),
     [eventsQuery.data?.events]
   );
-  const workshops = (workshopsQuery.data?.programs ?? []).slice(0, 3);
   const heroShowcase = settingsQuery.data?.heroShowcase ?? DEFAULT_HERO_SHOWCASE;
 
   return (
     <div className="bg-background">
-      <section className="relative overflow-hidden bg-background">
+      <section className="relative overflow-hidden bg-background pt-28 sm:pt-32 md:pt-36">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(182,106,203,0.10),_transparent_55%),radial-gradient(ellipse_at_bottom_right,_rgba(182,106,203,0.08),_transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(182,106,203,0.12),_transparent_55%),radial-gradient(ellipse_at_bottom_right,_rgba(182,106,203,0.08),_transparent_50%)]" />
           <motion.div
             className="absolute -left-20 top-16 h-64 w-64 rounded-full bg-accent/10 blur-3xl"
             animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
@@ -187,7 +177,7 @@ export default function HomePage() {
           />
         </div>
 
-        <Container className="relative grid items-center gap-12 py-16 lg:grid-cols-2 lg:gap-14 lg:py-20">
+        <Container className="relative grid items-center gap-12 pb-16 lg:grid-cols-2 lg:gap-14 lg:pb-20">
           <div className="space-y-7">
             <motion.p
               initial={{ opacity: 0, x: -24, scale: 0.9 }}
@@ -528,7 +518,7 @@ export default function HomePage() {
           <SectionHeader
             eyebrow="Explore"
             title="Continue the mission with us"
-            description="See classroom moments, learn the story, and explore workshops that strengthen foundational reading."
+            description="See classroom moments, learn the story, and explore reading success across Assam."
           />
           <div className="grid gap-4 lg:grid-cols-3">
             {teasers.map((teaser, i) => (
@@ -573,41 +563,6 @@ export default function HomePage() {
               </motion.div>
             ))}
           </div>
-        </Container>
-      </Section>
-
-      <WhoWorkshopIsForCompact />
-
-      <Section>
-        <Container className="space-y-8">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <SectionHeader
-              eyebrow="Workshops"
-              title="Teacher capacity building"
-              description="Structured phonics workshops for educators strengthening foundational reading."
-            />
-            <Button href="/workshops" variant="outline">
-              View all workshops
-            </Button>
-          </div>
-
-          {workshopsQuery.isLoading ? (
-            <ProgramGridSkeleton count={3} />
-          ) : workshops.length === 0 ? (
-            <EmptyState>
-              No workshops listed yet. Add workshops from Admin.
-            </EmptyState>
-          ) : (
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {workshops.map((workshop, i) => (
-                <WorkshopCard
-                  key={workshop._id}
-                  workshop={workshop}
-                  index={i}
-                />
-              ))}
-            </div>
-          )}
         </Container>
       </Section>
 

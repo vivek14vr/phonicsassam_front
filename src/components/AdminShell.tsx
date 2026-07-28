@@ -44,7 +44,7 @@ export function AdminShell({
   if (!token) return null;
 
   return (
-    <Container className="space-y-6 py-8">
+    <Container className="space-y-6 pt-28 pb-8 sm:pt-32 md:pt-36">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">

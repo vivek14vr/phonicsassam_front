@@ -35,7 +35,7 @@ export default function RootLayout({
       className={`${manrope.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body
-        className="flex min-h-full flex-col font-sans"
+        className="flex min-h-full flex-col bg-background font-sans"
         suppressHydrationWarning
       >
         <Providers>

@@ -32,6 +32,39 @@ export const siteImages = {
     src: "/scenes/school-building.jpg",
     alt: "A welcoming school building",
   },
+  /** About page — Assam classroom & training photos */
+  aboutHero: {
+    src: "/about/moment-2.jpg",
+    alt: "Assam students holding Phonics Pupil Book 1 in class",
+  },
+  aboutClass: {
+    src: "/about/classroom-1.jpg",
+    alt: "Teacher training session with educators in Assam",
+  },
+  aboutBooks: {
+    src: "/about/books-2.jpg",
+    alt: "Children and teachers with Phonics Pupil Book 1",
+  },
+  aboutBlend: {
+    src: "/about/blending.jpg",
+    alt: "Children practising phonics blending at the blackboard",
+  },
+  aboutFutures: {
+    src: "/about/futures-1.jpg",
+    alt: "Schoolgirls and educators in an Assam classroom",
+  },
+  aboutFuturesGroup: {
+    src: "/about/futures-4.jpg",
+    alt: "Classroom visit with teachers and learners in Assam",
+  },
+  aboutTraining: {
+    src: "/about/classroom-2.jpg",
+    alt: "Educators engaged in phonics capacity building",
+  },
+  aboutPractice: {
+    src: "/about/classroom-3.jpg",
+    alt: "Hands-on phonics practice during teacher training",
+  },
 } as const;
 
 export type SiteImageKey = keyof typeof siteImages;

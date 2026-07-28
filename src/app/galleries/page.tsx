@@ -118,7 +118,7 @@ function GalleriesPageContent() {
 
   return (
     <div className="bg-background">
-      <Section className="py-8 sm:py-10">
+      <Section className="pt-28 pb-8 sm:pt-32 sm:pb-10 md:pt-36">
         <Container className="space-y-6">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-xl space-y-2">
