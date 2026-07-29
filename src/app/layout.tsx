@@ -22,6 +22,9 @@ export const metadata: Metadata = {
   title: "Sketchy Phonics | Past Event Galleries",
   description:
     "Past event photo galleries and teaching programs for government school teachers — by Komal Goenka.",
+  icons: {
+    icon: [{ url: "/favicon.ico", sizes: "any" }],
+  },
 };
 
 export default function RootLayout({
