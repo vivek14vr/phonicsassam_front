@@ -13,7 +13,6 @@ const links = [
   { href: "/admin/cities", label: "Cities & schools" },
   { href: "/admin/common-gallery", label: "Common Gallery" },
   { href: "/admin/galleries", label: "Location galleries" },
-  { href: "/admin/workshops", label: "Workshops" },
 ];
 
 export function AdminShell({

@@ -30,7 +30,7 @@ const focusItems: {
     detail:
       "A clear approach so young learners can blend sounds, decode words, and read with confidence.",
     icon: "sound",
-    image: "aboutBlend",
+    image: "aboutFoundation",
   },
   {
     title: "Teacher capacity building",

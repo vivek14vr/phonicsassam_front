@@ -18,12 +18,14 @@ export function ScenePhoto({
   sizes?: string;
 }) {
   const data = siteImages[image];
+  const objectPosition = "position" in data ? data.position : undefined;
   return (
     <Image
       src={data.src}
       alt={data.alt}
       fill
       className={`object-cover ${className}`}
+      style={{ objectPosition }}
       sizes={sizes}
       priority={priority}
     />
@@ -329,13 +331,7 @@ export function ClassroomCtaBand({
             whileHover={{ scale: 1.08 }}
             transition={{ duration: 0.5 }}
           >
-            <Image
-              src="/scenes/kids-play.jpg"
-              alt="Children learning through play"
-              fill
-              className="object-cover"
-              sizes="40vw"
-            />
+            <ScenePhoto image="kidsPlay" sizes="40vw" />
           </motion.div>
         </motion.div>
       </div>

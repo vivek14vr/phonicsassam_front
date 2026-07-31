@@ -400,7 +400,7 @@ export default function HomePage() {
                             />
                           ) : (
                             <Image
-                              src="/scenes/classroom.jpg"
+                              src="/images/img1.jpeg"
                               alt=""
                               fill
                               className="object-cover"

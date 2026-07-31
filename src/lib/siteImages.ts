@@ -1,38 +1,39 @@
-/** Curated local scene photos matched to site content. */
+/** Project-owned photos supplied in public/images, matched to site content. */
 export const siteImages = {
   kidsPlay: {
-    src: "/scenes/kids-play.jpg",
-    alt: "Children playing and exploring together outdoors",
+    src: "/images/img2.jpeg",
+    alt: "Goalpara educators celebrating a phonics training session",
   },
   kidsLearning: {
-    src: "/scenes/kids-learning.jpg",
-    alt: "Children focused on learning together",
+    src: "/images/img7.jpeg",
+    alt: "A student sharing her vowel activity drawing",
   },
   classroom: {
-    src: "/scenes/classroom.jpg",
-    alt: "Students learning in a bright classroom",
+    src: "/images/img1.jpeg",
+    alt: "Morigaon educators gathered after district phonics training",
   },
   books: {
-    src: "/scenes/books.jpg",
-    alt: "Colorful books ready for early readers",
+    src: "/images/img6.jpeg",
+    alt: "Educators holding phonics teaching materials after training",
   },
   kidsSchool: {
-    src: "/scenes/kids-school.jpg",
-    alt: "School children smiling and ready for class",
+    src: "/images/img4.jpeg",
+    alt: "Smiling school children with their teacher",
   },
   teacherClass: {
-    src: "/scenes/teacher-class.jpg",
-    alt: "Teacher guiding students in the classroom",
+    src: "/images/img8.jpeg",
+    alt: "Teachers practising phonics actions during training",
   },
   kidsRead: {
-    src: "/scenes/kids-read.jpg",
-    alt: "Young children reading and discovering letters",
+    src: "/images/img5.jpeg",
+    alt: "A teacher demonstrating a vowel activity during training",
+    position: "center top",
   },
   school: {
-    src: "/scenes/school-building.jpg",
-    alt: "A welcoming school building",
+    src: "/images/img10.jpeg",
+    alt: "District phonics training participants gathered together",
   },
-  /** About page — Assam classroom & training photos */
+  /** About page — supplied Assam classroom and training photos. */
   aboutHero: {
     src: "/about/moment-2.jpg",
     alt: "Assam students holding Phonics Pupil Book 1 in class",
@@ -64,6 +65,10 @@ export const siteImages = {
   aboutPractice: {
     src: "/about/classroom-3.jpg",
     alt: "Hands-on phonics practice during teacher training",
+  },
+  aboutFoundation: {
+    src: "/about/books-1.jpg",
+    alt: "Phonics books supporting foundational reading practice",
   },
 } as const;
 

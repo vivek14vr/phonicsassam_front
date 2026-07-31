@@ -6,7 +6,7 @@ import { AdminShell } from "@/components/AdminShell";
 import { useAuth } from "@/components/AuthProvider";
 import { Button, Card, CardDescription, CardTitle, StatCardsSkeleton } from "@/components/ui";
 import { api } from "@/lib/api";
-import type { City, GalleryEvent, Program, School } from "@/lib/types";
+import type { City, GalleryEvent, School } from "@/lib/types";
 
 const sections = [
   {
@@ -33,12 +33,6 @@ const sections = [
     detail: "Create past-event galleries with photos, banner, and videos.",
     step: "4",
   },
-  {
-    href: "/admin/workshops",
-    title: "Workshops",
-    detail: "Manage workshop cards with fees, dates, venues, and CTAs.",
-    step: "5",
-  },
 ];
 
 export default function AdminOverviewPage() {
@@ -59,23 +53,15 @@ export default function AdminOverviewPage() {
     enabled: Boolean(token),
     queryFn: () => api.get<{ events: GalleryEvent[] }>("/events", token),
   });
-  const programsQuery = useQuery({
-    queryKey: ["admin", "programs"],
-    enabled: Boolean(token),
-    queryFn: () => api.get<{ programs: Program[] }>("/programs", token),
-  });
-
   const countsLoading =
     citiesQuery.isLoading ||
     schoolsQuery.isLoading ||
-    eventsQuery.isLoading ||
-    programsQuery.isLoading;
+    eventsQuery.isLoading;
 
   const counts = [
     { label: "Cities", value: citiesQuery.data?.cities.length ?? 0 },
     { label: "Schools", value: schoolsQuery.data?.schools.length ?? 0 },
     { label: "Location galleries", value: eventsQuery.data?.events.length ?? 0 },
-    { label: "Workshops", value: programsQuery.data?.programs.length ?? 0 },
   ];
 
   return (
@@ -86,7 +72,7 @@ export default function AdminOverviewPage() {
       {countsLoading ? (
         <StatCardsSkeleton />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-3">
           {counts.map((item) => (
             <Card key={item.label} className="space-y-1">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
@@ -100,7 +86,7 @@ export default function AdminOverviewPage() {
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-2">
         {sections.map((section) => (
           <Card key={section.href} className="flex flex-col">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">

@@ -331,7 +331,7 @@ function GalleriesPageContent() {
                               ) : (
                                 <div className="relative h-full">
                                   <Image
-                                    src="/scenes/kids-school.jpg"
+                                    src="/images/img2.jpeg"
                                     alt=""
                                     fill
                                     className="object-cover opacity-90"
