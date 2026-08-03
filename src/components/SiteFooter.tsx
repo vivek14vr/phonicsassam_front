@@ -58,31 +58,17 @@ export function SiteFooter() {
           <p>© {new Date().getFullYear()} Sketchy Phonics · Komal Goenka</p>
           <a
             href="https://www.roamingevents.com"
-            target="_blank"
-            rel="noopener noreferrer"
             className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-white/85 transition-colors hover:text-white sm:justify-end"
-            aria-label="Designed and developed by Roaming Events — visit www.roamingevents.com"
+            aria-label="Designed and developed by Roaming Events"
           >
             <span>Designed and developed by Roaming Events</span>
-            <span
-              className="relative block h-5 w-[132px] shrink-0 overflow-hidden"
-              role="img"
-              aria-label="Roaming Events"
-            >
-              <Image
-                src="/roaming-events-logo.png"
-                alt=""
-                width={4438}
-                height={1274}
-                aria-hidden="true"
-                className="absolute max-w-none"
-                unoptimized
-                style={{ width: 304, height: "auto", left: -16, top: -32 }}
-              />
-            </span>
-            <span className="font-medium text-accent underline decoration-accent/40 underline-offset-4">
-              www.roamingevents.com
-            </span>
+            <Image
+              src="/roaming-events-logo.png"
+              alt="Roaming Events"
+              width={120}
+              height={43}
+              className="h-7 w-auto shrink-0 sm:h-8"
+            />
           </a>
         </div>
       </div>
