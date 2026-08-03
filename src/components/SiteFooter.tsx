@@ -67,7 +67,7 @@ export function SiteFooter() {
               alt="Roaming Events"
               width={4357}
               height={1188}
-              className="h-8 w-auto shrink-0 sm:h-9"
+              className="ml-2 h-8 w-auto shrink-0 sm:ml-3 sm:h-9"
             />
           </a>
         </div>
