@@ -23,6 +23,16 @@ const nextConfig: NextConfig = {
         hostname: "komalgoenka.com",
       },
       {
+        protocol: "https",
+        hostname: "phonicsassam.com",
+        pathname: "/uploads/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.phonicsassam.com",
+        pathname: "/uploads/**",
+      },
+      {
         protocol: "http",
         hostname: "localhost",
         port: "4000",
