@@ -62,15 +62,13 @@ export function SiteFooter() {
             aria-label="Designed and developed by Roaming Events"
           >
             <span>Designed and developed by Roaming Events</span>
-            <span className="inline-flex shrink-0 items-center rounded-md bg-white px-2 py-1 shadow-sm">
-              <Image
-                src="/roaming-events-logo.png"
-                alt="Roaming Events"
-                width={120}
-                height={43}
-                className="h-7 w-auto sm:h-8"
-              />
-            </span>
+            <Image
+              src="https://phonicsassam.com/uploads/komal/branding/roaming-events-logo.png"
+              alt="Roaming Events"
+              width={4357}
+              height={1188}
+              className="h-8 w-auto shrink-0 sm:h-9"
+            />
           </a>
         </div>
       </div>
