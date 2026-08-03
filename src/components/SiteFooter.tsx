@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui";
 import { SiteLogo } from "@/components/SiteLogo";
@@ -52,8 +53,28 @@ export function SiteFooter() {
           </Button>
         </div>
       </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-white/45">
-        © {new Date().getFullYear()} Sketchy Phonics · Komal Goenka
+      <div className="border-t border-white/10 py-4 text-xs text-white/45">
+        <div className="section-shell flex flex-col items-center justify-between gap-3 text-center sm:flex-row sm:text-left">
+          <p>© {new Date().getFullYear()} Sketchy Phonics · Komal Goenka</p>
+          <div className="flex items-center gap-3">
+            <span>Designed and developed by Roaming Events</span>
+            <span
+              className="relative block h-[18px] w-28 shrink-0 overflow-hidden"
+              role="img"
+              aria-label="Roaming Events"
+            >
+              <Image
+                src="/roaming-events-logo.png"
+                alt=""
+                width={4438}
+                height={1274}
+                aria-hidden="true"
+                className="absolute max-w-none"
+                style={{ width: 556, height: "auto", left: -13, top: -27 }}
+              />
+            </span>
+          </div>
+        </div>
       </div>
     </footer>
   );
