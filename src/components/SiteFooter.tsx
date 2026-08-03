@@ -53,13 +53,19 @@ export function SiteFooter() {
           </Button>
         </div>
       </div>
-      <div className="border-t border-white/10 py-4 text-xs text-white/45">
+      <div className="border-t border-white/10 py-4 text-xs text-white/60">
         <div className="section-shell flex flex-col items-center justify-between gap-3 text-center sm:flex-row sm:text-left">
           <p>© {new Date().getFullYear()} Sketchy Phonics · Komal Goenka</p>
-          <div className="flex items-center gap-3">
+          <a
+            href="https://www.roamingevents.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-white/85 transition-colors hover:text-white sm:justify-end"
+            aria-label="Designed and developed by Roaming Events — visit www.roamingevents.com"
+          >
             <span>Designed and developed by Roaming Events</span>
             <span
-              className="relative block h-[18px] w-28 shrink-0 overflow-hidden"
+              className="relative block h-5 w-[132px] shrink-0 overflow-hidden"
               role="img"
               aria-label="Roaming Events"
             >
@@ -70,10 +76,14 @@ export function SiteFooter() {
                 height={1274}
                 aria-hidden="true"
                 className="absolute max-w-none"
-                style={{ width: 556, height: "auto", left: -13, top: -27 }}
+                unoptimized
+                style={{ width: 304, height: "auto", left: -16, top: -32 }}
               />
             </span>
-          </div>
+            <span className="font-medium text-accent underline decoration-accent/40 underline-offset-4">
+              www.roamingevents.com
+            </span>
+          </a>
         </div>
       </div>
     </footer>
