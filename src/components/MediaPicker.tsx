@@ -145,7 +145,7 @@ export function MediaPicker({
           <div>
             <h2 className="text-lg font-semibold text-ink">{title}</h2>
             <p className="mt-1 text-sm text-muted">
-              Pick from Cloudinary (or local uploads). Selected {picked.length}/
+              Pick from Amazon S3 (or local uploads). Selected {picked.length}/
               {maxSelect}.
             </p>
           </div>

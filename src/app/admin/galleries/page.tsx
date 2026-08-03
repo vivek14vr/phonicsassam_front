@@ -227,7 +227,7 @@ export default function AdminGalleriesPage() {
             >
               <span className="text-sm font-semibold text-ink">Add photos</span>
               <span className="text-xs text-muted">
-                Open Cloudinary library — pick existing or upload new
+                Open S3 library — pick existing or upload new
               </span>
             </button>
 

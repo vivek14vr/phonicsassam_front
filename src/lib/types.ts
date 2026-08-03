@@ -124,7 +124,7 @@ export type MediaAsset = {
   createdAt?: string;
   width?: number;
   height?: number;
-  source?: "cloudinary" | "local" | "upload";
+  source?: "s3" | "cloudinary" | "local" | "upload";
 };
 
 /** Editable homepage hero gallery card. */
