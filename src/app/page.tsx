@@ -210,9 +210,7 @@ export default function HomePage() {
               transition={{ duration: 0.7, delay: 0.55, ease: easeOut }}
               className="max-w-lg text-base leading-7 text-muted sm:text-lg sm:leading-8"
             >
-              {projectStory.belief} Led by {projectStory.founders}, the mission
-              builds strong reading skills in the foundational years through
-              teacher capacity building and classroom implementation.
+              {projectStory.homepageIntro}
             </motion.p>
 
             <motion.div

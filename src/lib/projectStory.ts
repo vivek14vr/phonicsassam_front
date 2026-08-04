@@ -8,6 +8,8 @@ export const projectStory = {
   founders: "Komal Goenka, Founder of Phonic World, together with Ramesh Jain",
   belief:
     "Every child in Assam deserves the opportunity to become a confident reader.",
+  homepageIntro:
+    "Every child in Assam deserves the opportunity to become a confident reader. This mission is being led by Komal Goenka, Founder of Phonic World, in collaboration with Ramesh Jain, and made possible through the visionary support and partnership of Samagra Shiksha, Assam and Manas Saikia Foundation. Together, we are strengthening foundational literacy by building teacher capacity and supporting effective classroom implementation, ensuring that thousands of children develop the joy and confidence to read.",
   challenge:
     "During visits to government primary schools, we met enthusiastic children eager to learn and dedicated teachers committed to making a difference. Yet one challenge stood out — many young learners struggled to read English because they lacked a structured approach to learning how to read.",
   opportunity:
